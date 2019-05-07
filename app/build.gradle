@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'http-plugin'
 
 android {
     compileSdkVersion 28
@@ -29,7 +30,7 @@ dependencies {
     implementation project(':testhttp')
     implementation project(':test2http')
     implementation project(':httplib')
-    implementation project(':httpAnnotation')
-    annotationProcessor project (':httpCompiler')
-
+//    annotationProcessor project (':httpCompiler')
 }
+
+

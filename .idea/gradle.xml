@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/httpAnnotation" />
             <option value="$PROJECT_DIR$/httpCompiler" />
             <option value="$PROJECT_DIR$/httplib" />
+            <option value="$PROJECT_DIR$/httpplugin" />
             <option value="$PROJECT_DIR$/test2http" />
             <option value="$PROJECT_DIR$/testhttp" />
           </set>

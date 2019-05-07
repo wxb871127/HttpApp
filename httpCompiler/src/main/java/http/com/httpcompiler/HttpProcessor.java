@@ -5,10 +5,10 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
-import java.io.File;
+import org.apache.commons.collections4.MapUtils;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -18,6 +18,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
@@ -25,31 +26,29 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import javax.tools.FileObject;
-import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
 
 import http.com.httpannotation.Test;
-import retrofit2.http.GET;
 
 @AutoService(Processor.class)
+@SupportedOptions({"moduleName"})
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({"retrofit2.http.POST","retrofit2.http.GET","http.com.httpannotation.Test"})
 public class HttpProcessor extends AbstractProcessor {
     private Filer mFiler;
     private Elements mElementUtils;
     private Messager mMessager;
+    private String moduleName = null;   // Module name, maybe its 'app' or others
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-
         mElementUtils = processingEnv.getElementUtils();
-
         mMessager = processingEnv.getMessager();
-
         mFiler = processingEnv.getFiler();
-
+        Map<String, String> options = processingEnv.getOptions();
+        if (MapUtils.isNotEmpty(options)) {
+            moduleName = options.get("moduleName");
+        }
     }
 
     @Override
@@ -64,6 +63,7 @@ public class HttpProcessor extends AbstractProcessor {
                 if (element.getKind() != ElementKind.METHOD)
                     throw new IllegalArgumentException("xxx");
                 Test get = element.getAnnotation(Test.class);
+
                 String tag = get.value();
                 MethodSpec method = MethodSpec.methodBuilder(tag)
                             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -77,7 +77,7 @@ public class HttpProcessor extends AbstractProcessor {
                     typeSpecBuilder.addMethod(method);
                 }
             }
-            JavaFile javaFile = JavaFile.builder("com.annotationlib", typeSpecBuilder.build()).build();
+            JavaFile javaFile = JavaFile.builder("com.annotationlib$$"+moduleName, typeSpecBuilder.build()).build();
             try {
 
                 javaFile.writeTo(mFiler);

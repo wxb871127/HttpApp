@@ -2,11 +2,11 @@ apply plugin: 'java'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
+    implementation 'org.apache.commons:commons-collections4:4.1'
 //    implementation 'com.squareup:javapoet:1.11.1'
 //    implementation 'com.google.auto.service:auto-service:1.0-rc4'
-    compile 'com.google.auto.service:auto-service:1.0-rc2'
-    compile 'com.squareup:javapoet:1.7.0'
+    implementation 'com.google.auto.service:auto-service:1.0-rc2'
+    implementation 'com.squareup:javapoet:1.7.0'
 
     implementation 'com.squareup.retrofit2:retrofit:2.2.0'
     implementation project (':httpAnnotation')
