@@ -7,9 +7,9 @@ import android.widget.Button;
 
 import com.httplib.APIManager;
 
-import http.com.httpannotation.Test;
 import http.com.testhttp.R;
-import http.com.testhttp.RequsetAPI;
+
+
 
 public class TestActivity extends AppCompatActivity {
     @Override
@@ -20,12 +20,14 @@ public class TestActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                APIManager.init("https://api.github.com/",RequsetAPI.class, null);
+//                APIManager.init("https://api.github.com/",RequsetAPI.class, null);
+                APIManager.test();
             }
         });
+//        MyGeneratedClass.aaaa(null);
     }
 
-    @Test("ccc")
+//    @Test("ccc")
     public void getId() {
 
     }

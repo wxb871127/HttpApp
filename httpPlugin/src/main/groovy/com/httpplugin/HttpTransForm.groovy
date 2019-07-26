@@ -13,7 +13,13 @@ import com.android.build.gradle.internal.pipeline.TransformManager
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 
+import javax.lang.model.element.Modifier
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
+
 public class HttpTransForm extends Transform {
+
+    HttpTransForm(){}
 
     @Override
     String getName() {
@@ -40,8 +46,6 @@ public class HttpTransForm extends Transform {
                    TransformOutputProvider outputProvider, boolean isIncremental)
             throws IOException, TransformException, InterruptedException {
 //        super.transform(context, inputs, referencedInputs, outputProvider, isIncremental)
-
-
         println 'xxxxxxxx into tansform'
 
         def clearCache = !isIncremental
@@ -55,32 +59,25 @@ public class HttpTransForm extends Transform {
             // 遍历jar
             input.jarInputs.each { JarInput jarInput ->
                 File src = jarInput.file
+//                println 'xxxxxxxxxx jar ' + src.absolutePath
                 File dest = getDestFile(jarInput, outputProvider)
+                scanJarFile(src)
                 FileUtils.copyFile(src, dest)
             }
 
             //遍历文件夹
             input.directoryInputs.each {
-                DirectoryInput directory ->
-                    File dest = outputProvider.getContentLocation(directory.name,
-                            directory.contentTypes, directory.scopes, Format.DIRECTORY)
-                    def root = directory.file.absolutePath
-                    if (!root.endsWith(File.separator))
-                        root += File.separator
-                    directory.file.eachFileRecurse {
+                DirectoryInput directoryInput ->
+                    File dest = outputProvider.getContentLocation(directoryInput.name,
+                            directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY)
+                    directoryInput.file.eachFileRecurse {
                         File file ->
-                            def fileName = file.absolutePath.replace(root, '')
-                            fileName = fileName.replaceAll("\\\\", "/")
-                            if (file.isFile()) {
-//                                registerScan.filterClass(file, root)
-//                                registerScan.filterRegisterIntoClass(new File(dest.absolutePath + File.separator + fileName), fileName)
-                                if(file.getName().endsWith("MyGeneratedClass"))
-                                    println 'xxxxxxxx class = ' + fileName
-                            }
+//                        println 'xxxxxxxx '+ file.absolutePath
                     }
-                    FileUtils.copyDirectory(directory.file, dest)
+                    FileUtils.copyDirectory(directoryInput.file, dest)
             }
         }
+//        Register.register("")
     }
 
     static File getDestFile(JarInput jarInput, TransformOutputProvider outputProvider) {
@@ -93,5 +90,21 @@ public class HttpTransForm extends Transform {
         // 获得输出文件
         File dest = outputProvider.getContentLocation(destName + "_" + hexName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
         return dest
+    }
+
+    void scanJarFile(File jarFile){
+        def file = new JarFile(jarFile)
+        Enumeration enumeration = file.entries()
+        while (enumeration.hasMoreElements()) {
+            JarEntry jarEntry = (JarEntry) enumeration.nextElement()
+            String entryName = jarEntry.getName()
+            if(entryName.endsWith("RequsetAPI.class")){
+                println 'xxxxxxxxxx jar file ' + entryName
+//                Register.register(entryName)
+            }
+        }
+        if (null != file) {
+            file.close()
+        }
     }
 }

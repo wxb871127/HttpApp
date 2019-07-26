@@ -3,13 +3,11 @@ apply plugin: 'java'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'org.apache.commons:commons-collections4:4.1'
-//    implementation 'com.squareup:javapoet:1.11.1'
-//    implementation 'com.google.auto.service:auto-service:1.0-rc4'
     implementation 'com.google.auto.service:auto-service:1.0-rc2'
     implementation 'com.squareup:javapoet:1.7.0'
-
     implementation 'com.squareup.retrofit2:retrofit:2.2.0'
-    implementation project (':httpAnnotation')
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 }
 
 sourceCompatibility = 1.8

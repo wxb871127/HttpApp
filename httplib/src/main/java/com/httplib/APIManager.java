@@ -1,19 +1,21 @@
 package com.httplib;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIManager {
     private static OkHttpClient client;
     private static ConcurrentHashMap<String, Object> APICache = new ConcurrentHashMap<>();
-    private static String mUrl;
+    private static String mUrl = "http://172.18.13.233:9200/";
     private static Interceptor interceptor;
     private static List<Class> clazs = new ArrayList<>();
 
@@ -24,7 +26,7 @@ public class APIManager {
         interceptor = interce;
     }
 
-    static <T> T getAPI(Class<T> clazz)
+    public static <T> T getAPI(Class<T> clazz)
     {
         if (null == client)
         {
@@ -38,8 +40,9 @@ public class APIManager {
                 if (api != null) return api;
 
                 api = new Retrofit.Builder().client(client)
-                        .addConverterFactory(CustomConverterFactory.create(GsonFactory.createCustomGson()))
-                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+//                        .addConverterFactory(CustomConverterFactory.create(GsonFactory.createCustomGson()))
+//                        .addConverterFactory(GsonConverterFactory.create()) //添加Gson
+//                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                         .baseUrl(mUrl)
                         .build().create(clazz);
                 APICache.put(clazz.getName(), api);
@@ -58,4 +61,12 @@ public class APIManager {
            builder = builder.addInterceptor(interceptor);
        return  builder.build();
     }
+
+    public static void test(){
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        for(int i=0; i<stackTraceElements.length; i++) {
+            Log.e("xxxxxxxx", Thread.currentThread().getStackTrace()[i].getClassName());
+        }
+    }
+
 }

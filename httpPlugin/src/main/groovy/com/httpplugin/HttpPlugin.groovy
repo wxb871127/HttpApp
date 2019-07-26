@@ -9,13 +9,26 @@ public  class HttpPlugin implements Plugin<Project>{
 
     @Override
     public void apply(Project project){
-        def isApp = project.plugins.hasPlugin(AppPlugin)
-        def android = project.extensions.getByType(AppExtension)
         println 'xxxxxxxxxxx into httpplugin'
-        if(isApp) {
-            HttpTransForm httpTransForm = new HttpTransForm()
-            android.registerTransform(httpTransForm)
+        def isApp = project.plugins.hasPlugin(AppPlugin)
+        if (isApp) {
+            println 'project(' + project.name + ') apply http-plugin plugin'
+
+//            Register.register("")
+//            def android = project.extensions.getByType(AppExtension)
+//            def transformImpl = new HttpTransForm()
+//            android.registerTransform(transformImpl)
+////            project.afterEvaluate {
+////                init(project, transformImpl)//此处要先于transformImpl.transform方法执行
+////            }
         }
+
+//         dump();
+//        Register.register("")
     }
+
+
+
+
 
 }

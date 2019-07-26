@@ -1,20 +1,23 @@
 package http.com.test2http;
 
-import http.com.httpannotation.Test;
+//import http.com.httpannotation.Test;
+
+//import com.httplib.Test;
+
+//import http.com.httpannotation.Test;
 
 public class GitHubRepo {
     private int id;
     private String name;
+    private String xb;
 
     public GitHubRepo() {
     }
 
-    @Test("aaaa")
     public int getId() {
         return id;
     }
 
-    @Test("aaa2")
     public String getName() {
         return name;
     }
