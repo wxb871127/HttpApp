@@ -9,8 +9,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.0'
-        classpath 'com.httpplugin:httpplugin:1.0.0'
-//        classpath 'com.httpannotation:httpannotation:1.0.0'
+//        classpath 'com.register.plugin:registerplugin:1.0.0'
     }
 }
 

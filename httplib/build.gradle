@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'http-plugin'
+//apply plugin: 'register-plugin'
 
 android {
     compileSdkVersion 28

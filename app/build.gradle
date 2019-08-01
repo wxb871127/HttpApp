@@ -36,3 +36,5 @@ dependencies {
     implementation project(':httplib')
     annotationProcessor project (':httpCompiler')
 }
+
+//apply plugin: 'register-plugin'

@@ -2,20 +2,19 @@ package com.http.compiler;
 
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-
 import org.apache.commons.collections4.MapUtils;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -27,17 +26,16 @@ import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-
 import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -52,6 +50,7 @@ public class HttpProcessor extends AbstractProcessor {
     private Elements mElementUtils;
     private Messager mMessager;
     private String moduleName = null;
+    private String from;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -81,6 +80,9 @@ public class HttpProcessor extends AbstractProcessor {
                 for(Element element : getElements)
                     typeSpecBuilder.addMethod(parseMethod(element, GET.class));
             }
+
+            typeSpecBuilder.addField(parseField());
+
             JavaFile javaFile = JavaFile.builder("com.http."+moduleName, typeSpecBuilder.build()).build();
             javaFile.writeTo(mFiler);
         } catch (IOException e) {
@@ -110,6 +112,12 @@ public class HttpProcessor extends AbstractProcessor {
         return arguments.substring(0, arguments.length()-1);
     }
 
+    private FieldSpec parseField(){
+        return FieldSpec.builder(String.class, "from")
+                .addModifiers(Modifier.PUBLIC)
+                .initializer(CodeBlock.of("$S", from)).build();
+    }
+
     private MethodSpec parseMethod(Element element, Class annotationClass){
         if (element.getKind() != ElementKind.METHOD)
             throw new IllegalArgumentException("only method annotation will be processor");
@@ -136,20 +144,29 @@ public class HttpProcessor extends AbstractProcessor {
         ClassName apiManger = ClassName.get("com.httplib", "APIManager");
         TypeElement typeElement = (TypeElement)(element.getEnclosingElement());
         ClassName requestAPI = ClassName.get(typeElement);
+        from = requestAPI.toString();
+
 
         TypeMirror typeMirror = methodElement.getReturnType();
+        typeMirror = ((DeclaredType)typeMirror).asElement().asType();
         TypeMirror typeMirror1 = mElementUtils.getTypeElement(Call.class.getName()).asType();
         TypeMirror typeMirror2 = mElementUtils.getTypeElement(Observable.class.getName()).asType();
-//        if(Types)
+        Types types = processingEnv.getTypeUtils();
 
 
-
+        typeMirror.toString();
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(returnType)
                 .addStatement("return $T.getAPI($T.class).$L("+ parseArguments(methodElement) +")",
-                        apiManger, requestAPI, methodName)
-                .addParameters(params);
+                        apiManger, requestAPI, methodName);
+
+//        if(types.isSameType(typeMirror, typeMirror1)){
+////             methodBuilder.addStatement("call.");
+//        }else if(types.isSameType(typeMirror, typeMirror2)){
+//            Observable<ResponseBody> call = null;
+//
+//        }
+        methodBuilder.addParameters(params).returns(returnType);
         return methodBuilder.build();
     }
 

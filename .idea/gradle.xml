@@ -8,10 +8,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/RegisterPlugin" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/httpCompiler" />
             <option value="$PROJECT_DIR$/httplib" />
-            <option value="$PROJECT_DIR$/httpplugin" />
             <option value="$PROJECT_DIR$/test2http" />
             <option value="$PROJECT_DIR$/testhttp" />
           </set>

@@ -42,7 +42,8 @@ public class APIManager {
                 api = new Retrofit.Builder().client(client)
 //                        .addConverterFactory(CustomConverterFactory.create(GsonFactory.createCustomGson()))
 //                        .addConverterFactory(GsonConverterFactory.create()) //添加Gson
-//                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                        .addConverterFactory(NonstandardConverterFactory.create(GsonFactory.createCustomGson()))
+                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                         .baseUrl(mUrl)
                         .build().create(clazz);
                 APICache.put(clazz.getName(), api);
