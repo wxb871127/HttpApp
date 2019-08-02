@@ -109,8 +109,19 @@ public final class HttpRequest{
         return new Builder(methodName);
     }
 
-    public void autoRegister(Class key, Class value){
-        this.BINDINGS.put(key, value);
+    public void autoRegister(Class clas){
+        try {
+           String from = (String)clas.getField("from").get(clas.newInstance());
+            this.BINDINGS.put(Class.forName(from), clas);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public static final class Builder<T> {

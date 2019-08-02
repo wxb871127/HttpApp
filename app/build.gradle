@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'register-plugin'
 
 android {
     compileSdkVersion 28
@@ -36,5 +36,4 @@ dependencies {
     implementation project(':httplib')
     annotationProcessor project (':httpCompiler')
 }
-
 //apply plugin: 'register-plugin'

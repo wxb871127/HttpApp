@@ -8,7 +8,7 @@ import http.com.testhttp.RequsetAPI;
 
 public class Test {
     public static void test(){
-        Map map = NonstandParam.getQueryParams("tjzxsqm", "aaaa");
+        Map map = NonstandParam.getQueryParams("tjzxsqm", "yhtj");
 //        Observable<List<NonstandardBaseResult<ProjectUrlResult>>> call = RequestProxy.getSQM(map);
         HttpRequest.request("getSQM").parameter(map).from(RequsetAPI.class).build()
         .setListener(new HttpRequest.OnRequestListener<List<NonstandardBaseResult<ProjectUrlResult>>>() {

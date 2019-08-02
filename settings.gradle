@@ -1,1 +1,1 @@
-include ':app', ':testhttp', ':test2http', ':RegisterPlugin',':httplib',':httpCompiler'
+include ':app', ':testhttp', ':test2http', ':registerplugin',':httplib',':httpCompiler'

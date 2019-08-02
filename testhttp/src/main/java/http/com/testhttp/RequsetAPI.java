@@ -9,6 +9,6 @@ import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 public interface RequsetAPI {
-    @POST("sq/sqm/_search")
+    @POST("sq/sqm/_search?pretty")
     Observable<List<NonstandardBaseResult<ProjectUrlResult>>> getSQM(@Body Map map);
 }

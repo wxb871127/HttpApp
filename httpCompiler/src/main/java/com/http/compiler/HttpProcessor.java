@@ -11,6 +11,8 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.collections4.MapUtils;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,8 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.tools.Diagnostic;
+
 import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -68,6 +72,8 @@ public class HttpProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Set<? extends Element> postElements = roundEnv.getElementsAnnotatedWith(POST.class);
         Set<? extends Element> getElements = roundEnv.getElementsAnnotatedWith(GET.class);
+        if(postElements.size() == 0 && getElements.size() == 0)
+            return true;
         try {
             TypeSpec.Builder typeSpecBuilder = TypeSpec.classBuilder("RequestProxy")
                     .addModifiers(Modifier.PUBLIC);
@@ -82,6 +88,26 @@ public class HttpProcessor extends AbstractProcessor {
             }
 
             typeSpecBuilder.addField(parseField());
+
+            ClassName annotation = ClassName.get("com.httplib.annotation", "HttpProxy");
+            typeSpecBuilder.addAnnotation(annotation);
+
+
+//            annotation1.
+            //            try {
+//                Class a = annotation.getClass();
+//                Field field = a.getField("from");
+//                field.setAccessible(true);
+//                field.set(annotation.getClass().newInstance(), from);
+//                typeSpecBuilder.addAnnotation(a);
+//            } catch (NoSuchFieldException e) {
+//                e.printStackTrace();
+//            } catch (IllegalAccessException e) {
+//                e.printStackTrace();
+//            } catch (InstantiationException e) {
+//                e.printStackTrace();
+//            }
+
 
             JavaFile javaFile = JavaFile.builder("com.http."+moduleName, typeSpecBuilder.build()).build();
             javaFile.writeTo(mFiler);
@@ -120,7 +146,7 @@ public class HttpProcessor extends AbstractProcessor {
 
     private MethodSpec parseMethod(Element element, Class annotationClass){
         if (element.getKind() != ElementKind.METHOD)
-            throw new IllegalArgumentException("only method annotation will be processor");
+            mMessager.printMessage(Diagnostic.Kind.ERROR, "only method annotation will be processor");
 
         List<? extends AnnotationMirror> tannotations = element.getAnnotationMirrors();
         TypeElement annotationElement = mElementUtils.getTypeElement(annotationClass.getName());
