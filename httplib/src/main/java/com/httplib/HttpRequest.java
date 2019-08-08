@@ -1,23 +1,18 @@
 package com.httplib;
 
 import android.util.Log;
-
+import com.httplib.config.HttpConfig;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.ResponseBody;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public final class HttpRequest{
-    static final Map<Class, Class> BINDINGS = new LinkedHashMap<>();
     private OnRequestListener listener;
 
     public interface OnRequestListener<T>{
@@ -29,18 +24,12 @@ public final class HttpRequest{
         this.listener = listener;
     }
 
-    private HttpRequest(Builder builder) {
+    private HttpRequest realRequest(Builder builder){
         try {
             Class paramClass = builder.params.getClass();
             if(paramClass.isAnonymousClass())
                 paramClass = builder.params.getClass().getSuperclass();
-            try {
-//                BINDINGS.put(builder.clas, Class.forName("com.http.test2http.RequestProxy"));
-                BINDINGS.put(builder.clas, Class.forName("com.http.testhttp.RequestProxy"));
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            final Method method = getProxyClass(builder.clas).getDeclaredMethod(builder.methodName, paramClass);
+            final Method method = HttpConfig.getProxyClass(builder.clas).getDeclaredMethod(builder.methodName, paramClass);
             if(method == null)
                 throw new IllegalArgumentException("can't find method" + builder.methodName + " in class " + builder.clas.getName());
             Object object = method.invoke(builder.clas, builder.params);
@@ -98,30 +87,11 @@ public final class HttpRequest{
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-    }
-
-    private Class getProxyClass(Class clas){
-
-        return BINDINGS.get(clas);
+        return this;
     }
 
     public static Builder request(String methodName) {
         return new Builder(methodName);
-    }
-
-    public void autoRegister(Class clas){
-        try {
-           String from = (String)clas.getField("from").get(clas.newInstance());
-            this.BINDINGS.put(Class.forName(from), clas);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     public static final class Builder<T> {
@@ -144,7 +114,7 @@ public final class HttpRequest{
         }
 
         public HttpRequest build() {
-            return new HttpRequest(this);
+            return new HttpRequest().realRequest(this);
         }
     }
 }

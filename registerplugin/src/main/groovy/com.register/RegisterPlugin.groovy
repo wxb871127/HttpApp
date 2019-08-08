@@ -1,13 +1,13 @@
 package com.register
 
 import com.android.build.gradle.AppExtension
-import com.android.build.gradle.BaseExtension
+import com.register.config.RegisterConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import com.android.build.gradle.AppPlugin
 
 
-public  class RegisterPlugin implements Plugin<Project>{
+class RegisterPlugin implements Plugin<Project>{
 
     public static final String ExtenName = 'registerplugin'
 
@@ -28,7 +28,8 @@ public  class RegisterPlugin implements Plugin<Project>{
                 List<Map<String, Object>> registerInfo = new ArrayList<>()
                 Map<String, Object> map = new HashMap<>()
                 map.put("scanAnnotationClass","com.httplib.annotation.HttpProxy");
-                map.put("registerIntoClass","com.httplib.HttpRequest")
+                map.put("registerIntoClass","com.httplib.config.HttpConfig")
+                map.put('registerInMethod','init')
                 map.put("registerMethod","autoRegister");
                 registerInfo.add(map);
 

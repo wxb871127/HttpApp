@@ -2,18 +2,20 @@ package com.register
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
-//import com.register.util.RegisterScan
-import com.register.util.ScanUtil
+import com.register.config.RegisterConfig
+import com.register.util.FileInvoke
+import com.register.util.FileUtil
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
+import org.objectweb.asm.tree.ClassNode
 
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
-public class RegisterTransForm extends Transform{
+class RegisterTransForm extends Transform{
     RegisterConfig registerConfig
 
-    public RegisterTransForm(){}
+    RegisterTransForm(){}
 
     @Override
     String getName() {
@@ -56,36 +58,64 @@ public class RegisterTransForm extends Transform{
             input.jarInputs.each { JarInput jarInput ->
                 File src = jarInput.file
                 File dest = getDestFile(jarInput, outputProvider)
-                if(!ScanUtil.isSupportJar(src))
-
+                def file = new JarFile(src)
+                Enumeration enumeration = file.entries()
+                while (enumeration.hasMoreElements()) {
+                    JarEntry jarEntry = (JarEntry) enumeration.nextElement()
+                    String fileName = jarEntry.getName()
+                    if(jarEntry.isDirectory()) continue
+                    if (!fileName.endsWith('.class')) continue
+                    if (!FileUtil.isSystemFile(fileName)) {
+                        InputStream inputStream = file.getInputStream(jarEntry)
+                        ClassNode classNode = FileUtil.getClassNode(inputStream)
+                        List<String> list = FileUtil.getAnnotationNames(classNode)
+                        registerConfig.matchRegisterFile(fileName, dest)
+                        registerConfig.matchAnnotation(list, fileName)
+                        registerConfig.matchSuperClass(classNode.superName, fileName)
+                    }
+                }
                 FileUtils.copyFile(src, dest)
             }
 
+            boolean leftSlash = File.separator == '/'
             //遍历文件夹
             input.directoryInputs.each {
                 DirectoryInput directory ->
                     File dest = outputProvider.getContentLocation(directory.name,
                             directory.contentTypes, directory.scopes, Format.DIRECTORY)
-                    def root = directory.file.absolutePath
+                    String root = directory.file.absolutePath
                     if (!root.endsWith(File.separator))
                         root += File.separator
-                    directory.file.eachFileRecurse {
-                        File file ->
-                            def fileName = file.absolutePath.replace(root, '')
+                    directory.file.eachFileRecurse { File file ->
+                        def fileName = file.absolutePath.replace(root, '')
+                        if (!leftSlash) {
                             fileName = fileName.replaceAll("\\\\", "/")
-                            if (file.isFile()) {
-                                if(fileName.endsWith("RequsetAPI.class"))
-                                    println 'xxxxxx src file ' + file.absoluteFile
-                                registerScan.filterClass(file, root)
-//                                registerScan.filterRegisterIntoClass(new File(dest.absolutePath + File.separator + fileName), fileName)
+                        }
+                        if (fileName.endsWith('.class')) {
+                            if (!FileUtil.isSystemFile(fileName)) {
+                                registerConfig.matchRegisterFile(fileName, file)
+                                InputStream inputStream = new FileInputStream(file)
+                                ClassNode classNode = FileUtil.getClassNode(inputStream)
+                                List<String> list = FileUtil.getAnnotationNames(classNode)
+                                registerConfig.matchAnnotation(list, fileName)
+                                registerConfig.matchSuperClass(classNode.superName, fileName)
                             }
+                        }
                     }
                     FileUtils.copyDirectory(directory.file, dest)
             }
         }
 
-        RegisterClassVisitor classVisitor = new RegisterClassVisitor(registerConfig)
-        classVisitor.registerClass()
+        println  registerConfig.toString()
+
+        registerConfig.registerInfoList.each {
+            registerInfo->
+                FileInvoke.invoke(registerInfo.registerIntoFile,
+                        registerInfo.registerIntoClass,
+                        registerInfo.registerInMethod,
+                        registerInfo.registerMethod, registerInfo.needRegisterClass)
+
+        }
     }
 
     static File getDestFile(JarInput jarInput, TransformOutputProvider outputProvider) {
