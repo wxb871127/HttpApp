@@ -19,7 +19,7 @@ class RegisterConfig{
                 RegisterInfo registerInfo = new RegisterInfo()
                 registerInfo.scanAnnotationClass = map.get('scanAnnotationClass')
                 registerInfo.registerIntoClass = map.get('registerIntoClass')
-                registerInfo.registerInMethod = map.get('registerInMethod')
+                registerInfo.initMethod = map.get('initMethod')
                 registerInfo.registerMethod = map.get('registerMethod')
                 registerInfo.superClass = map.get('superClass')
                 registerInfo.init()

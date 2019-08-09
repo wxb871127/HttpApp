@@ -8,7 +8,6 @@ import com.register.util.FileUtil
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.objectweb.asm.tree.ClassNode
-
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
@@ -112,7 +111,7 @@ class RegisterTransForm extends Transform{
             registerInfo->
                 FileInvoke.invoke(registerInfo.registerIntoFile,
                         registerInfo.registerIntoClass,
-                        registerInfo.registerInMethod,
+                        registerInfo.initMethod,
                         registerInfo.registerMethod, registerInfo.needRegisterClass)
 
         }

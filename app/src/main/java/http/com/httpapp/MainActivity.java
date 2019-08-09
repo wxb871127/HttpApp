@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
+import com.http.RequestAPI;
 import com.httplib.config.HttpConfig;
 import com.test.Test;
 import com.test2.Test2;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                RequestAPI.class.getMethods();//.getGenericParameterTypes();
                 Test.test();
             }
         });

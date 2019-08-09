@@ -26,10 +26,7 @@ public final class HttpRequest{
 
     private HttpRequest realRequest(Builder builder){
         try {
-            Class paramClass = builder.params.getClass();
-            if(paramClass.isAnonymousClass())
-                paramClass = builder.params.getClass().getSuperclass();
-            final Method method = HttpConfig.getProxyClass(builder.clas).getDeclaredMethod(builder.methodName, paramClass);
+            final Method method = findMethod(builder.clas, builder.methodName, builder.params.getClass());
             if(method == null)
                 throw new IllegalArgumentException("can't find method" + builder.methodName + " in class " + builder.clas.getName());
             Object object = method.invoke(builder.clas, builder.params);
@@ -80,14 +77,31 @@ public final class HttpRequest{
                             }
                         });
             }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
         return this;
+    }
+
+    private Method findMethod(Class clas, String methodName, Class paramClass){
+        Method method = null;
+        if(paramClass.isAnonymousClass())
+            paramClass = paramClass.getSuperclass();
+
+        Method[] methods = HttpConfig.getProxyClass(clas).getDeclaredMethods();
+        for(Method item : methods){
+            if(item.getName().equals(methodName)) {
+                Class[] parameterTypes = item.getParameterTypes();
+                for(Class parameterType : parameterTypes){
+                    if(parameterType.isAssignableFrom(paramClass)){
+                        return item;
+                    }
+                }
+            }
+        }
+        return method;
     }
 
     public static Builder request(String methodName) {

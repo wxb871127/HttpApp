@@ -12,7 +12,7 @@ class RegisterPlugin implements Plugin<Project>{
     public static final String ExtenName = 'registerplugin'
 
     @Override
-    public void apply(Project project){
+    void apply(Project project){
         def isApp = project.plugins.hasPlugin(AppPlugin)
 
         if(isApp) {
@@ -29,7 +29,7 @@ class RegisterPlugin implements Plugin<Project>{
                 Map<String, Object> map = new HashMap<>()
                 map.put("scanAnnotationClass","com.httplib.annotation.HttpProxy");
                 map.put("registerIntoClass","com.httplib.config.HttpConfig")
-                map.put('registerInMethod','init')
+                map.put('initMethod','init')
                 map.put("registerMethod","autoRegister");
                 registerInfo.add(map);
 

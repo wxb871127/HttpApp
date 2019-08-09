@@ -1,18 +1,18 @@
 package com.register.config;
 
-public class RegisterInfo{
+class RegisterInfo{
     String scanAnnotationClass //扫描注解的类
     String registerIntoClass //自动注册到这个Class
     File registerIntoFile //自动注册到这个文件
-    String registerInMethod//在该方法中调用注册方法进行注册
+    String initMethod//在该方法中调用注册方法进行注册
     String registerMethod //注册方法
     String superClass //父类
     List<String> needRegisterClass = new ArrayList<>() //待注册的类集合
 
 
-    public RegisterInfo(){}
+    RegisterInfo(){}
 
-    public void init(){
+    void init(){
         if(registerIntoClass != null)
             registerIntoClass = registerIntoClass.replaceAll("\\.","/")
         if(superClass != null)
@@ -35,7 +35,7 @@ public class RegisterInfo{
         stringBuilder.append('scanAnnotationClass='+scanAnnotationClass)
         .append(';registerIntoFile='+registerIntoFile).append('\n')
         .append(';registerIntoClass='+registerIntoClass)
-        .append(';registerInMethod='+registerInMethod)
+        .append(';registerInMethod='+initMethod)
         .append(';registerMethod='+registerMethod).append('\n')
         .append(';superClass='+superClass)
         .append(';needRegisterClass='+needRegisterClassNames)

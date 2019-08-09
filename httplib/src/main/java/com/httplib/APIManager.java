@@ -2,6 +2,8 @@ package com.httplib;
 
 import android.util.Log;
 
+import com.httplib.interceptor.HttpInterceptor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,17 +59,10 @@ public class APIManager {
        OkHttpClient.Builder builder =  new OkHttpClient.Builder()
                 .readTimeout(60, TimeUnit.SECONDS)
                 .connectTimeout(10, TimeUnit.SECONDS)
-                .writeTimeout(60, TimeUnit.SECONDS);
+                .writeTimeout(60, TimeUnit.SECONDS)
+               .addInterceptor(new HttpInterceptor());
        if(interceptor != null)
            builder = builder.addInterceptor(interceptor);
        return  builder.build();
     }
-
-    public static void test(){
-        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        for(int i=0; i<stackTraceElements.length; i++) {
-            Log.e("xxxxxxxx", Thread.currentThread().getStackTrace()[i].getClassName());
-        }
-    }
-
 }
