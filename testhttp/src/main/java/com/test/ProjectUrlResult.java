@@ -1,9 +1,12 @@
 package com.test;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ProjectUrlResult
 {
     /*后台地址*/
     private String tjzxdz;
+    @SerializedName("index")
     private String id;
     private String tjzxsqm;
     private String tjzxmc;

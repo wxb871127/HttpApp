@@ -1,6 +1,5 @@
 package com.httplib;
 
-import android.util.Log;
 import com.httplib.config.HttpConfig;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,7 +27,7 @@ public final class HttpRequest{
         try {
             final Method method = findMethod(builder.clas, builder.methodName, builder.params.getClass());
             if(method == null)
-                throw new IllegalArgumentException("can't find method" + builder.methodName + " in class " + builder.clas.getName());
+                throw new IllegalArgumentException("can't find method " + builder.methodName + " in class " + builder.clas.getName());
             Object object = method.invoke(builder.clas, builder.params);
             final Class returnType = method.getReturnType();
             if(returnType.equals(retrofit2.Call.class)){
@@ -36,7 +35,6 @@ public final class HttpRequest{
                     @Override
                     public void onResponse(retrofit2.Call<Object> call, Response<Object> response) {
                         //数据请求成功
-                        Log.e("xxxxxx", response.toString());
                         if(listener != null){
                             listener.onSuccess(response.body());
                         }
@@ -45,7 +43,8 @@ public final class HttpRequest{
                     @Override
                     public void onFailure(retrofit2.Call<Object> call, Throwable t) {
                         //数据请求失败
-                        Log.e("yyyyyyyyyy", t.toString());
+                        if(listener != null)
+                            listener.onFailed(t.toString());
                     }
                 });
             }else if(returnType.equals(io.reactivex.Observable.class)){
@@ -59,14 +58,12 @@ public final class HttpRequest{
 
                             @Override
                             public void onNext(Object object) {
-                                Log.e("xxxxx", object.toString());
                                 if(listener != null)
                                     listener.onSuccess(object);
                             }
 
                             @Override
                             public void onError(Throwable e) {
-                                Log.e("yyyy", e.toString());
                                 if(listener != null)
                                     listener.onFailed(e.toString());
                             }

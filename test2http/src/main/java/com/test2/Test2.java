@@ -23,7 +23,8 @@ public class Test2 {
         setListener(new HttpRequest.OnRequestListener<ResponseBody>() {
             @Override
             public void onSuccess(ResponseBody object) {
-                Log.e("d", object.toString());
+                if(object != null)
+                    Log.e("d", object.toString());
             }
 
             @Override

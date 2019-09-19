@@ -1,4 +1,6 @@
 apply plugin: 'java'
+apply from: './nexus-push.gradle'
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

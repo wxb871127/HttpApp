@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface BaseUrl {
-    String url() default "";
+public @interface TypeAdapter {
+    Class adapter();
 }

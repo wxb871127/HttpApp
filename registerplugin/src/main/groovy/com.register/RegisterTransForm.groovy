@@ -59,6 +59,7 @@ class RegisterTransForm extends Transform{
                 File dest = getDestFile(jarInput, outputProvider)
                 def file = new JarFile(src)
                 Enumeration enumeration = file.entries()
+
                 while (enumeration.hasMoreElements()) {
                     JarEntry jarEntry = (JarEntry) enumeration.nextElement()
                     String fileName = jarEntry.getName()
@@ -68,6 +69,8 @@ class RegisterTransForm extends Transform{
                         InputStream inputStream = file.getInputStream(jarEntry)
                         ClassNode classNode = FileUtil.getClassNode(inputStream)
                         List<String> list = FileUtil.getAnnotationNames(classNode)
+//                        println 'xxxxxxx src = ' + src.absolutePath
+//                        println 'xxxxxxx dest = ' + dest.absolutePath
                         registerConfig.matchRegisterFile(fileName, dest)
                         registerConfig.matchAnnotation(list, fileName)
                         registerConfig.matchSuperClass(classNode.superName, fileName)
@@ -76,6 +79,7 @@ class RegisterTransForm extends Transform{
                 FileUtils.copyFile(src, dest)
             }
 
+            println 'xxxxxxxxx start each directory '
             boolean leftSlash = File.separator == '/'
             //遍历文件夹
             input.directoryInputs.each {
@@ -92,6 +96,7 @@ class RegisterTransForm extends Transform{
                         }
                         if (fileName.endsWith('.class')) {
                             if (!FileUtil.isSystemFile(fileName)) {
+//                                println 'xxxxxxxxxx check class filename = ' + fileName
                                 registerConfig.matchRegisterFile(fileName, file)
                                 InputStream inputStream = new FileInputStream(file)
                                 ClassNode classNode = FileUtil.getClassNode(inputStream)

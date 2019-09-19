@@ -3,6 +3,7 @@ apply plugin: 'register-plugin'
 
 android {
     compileSdkVersion 28
+//    buildToolsVersion 28
     defaultConfig {
         applicationId "http.com.httpapp"
         minSdkVersion 19

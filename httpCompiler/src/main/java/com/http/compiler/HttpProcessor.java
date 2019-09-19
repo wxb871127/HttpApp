@@ -11,8 +11,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.apache.commons.collections4.MapUtils;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +37,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
-
 import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -70,6 +67,7 @@ public class HttpProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        mMessager.printMessage(Diagnostic.Kind.WARNING, "start annotationProcess..............");
         Set<? extends Element> postElements = roundEnv.getElementsAnnotatedWith(POST.class);
         Set<? extends Element> getElements = roundEnv.getElementsAnnotatedWith(GET.class);
         if(postElements.size() == 0 && getElements.size() == 0)
