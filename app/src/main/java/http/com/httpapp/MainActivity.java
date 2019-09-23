@@ -15,6 +15,9 @@ import com.test.Test;
 import com.test2.Test2;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
@@ -32,21 +35,20 @@ public class MainActivity extends AppCompatActivity {
         appButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HttpRequest.request("listRepos").parameter("octocat").from(RequestAPI.class).build()
-                        .setListener(new HttpRequest.OnRequestListener<List<GitHubRepo>>() {
-                            @Override
-                            public void onSuccess(List<GitHubRepo> object) {
-                                for(GitHubRepo gitHubRepo : object) {
-                                    Log.e("gitHubRepo", gitHubRepo.toString());
-                                }
-                            }
+                HttpRequest.request("listRepos").parameter("octocat").from(RequestAPI.class)
+                        .create().execute(new HttpRequest.CallBack<List<GitHubRepo>>() {
+                    @Override
+                    public void onSuccess(List<GitHubRepo> object) {
+                        for(GitHubRepo gitHubRepo : object) {
+                            Log.e("gitHubRepo", gitHubRepo.toString());
+                        }
+                    }
 
-                            @Override
-                            public void onFailed(String msg) {
-                                Log.e("d", msg);
-                            }
-
-                        });
+                    @Override
+                    public void onFailed(String msg) {
+                        Log.e("d", msg);
+                    }
+                });
             }
         });
 

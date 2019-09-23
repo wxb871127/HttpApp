@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.register</groupId>
   <artifactId>registerplugin</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>

@@ -5,6 +5,8 @@ import com.google.gson.Gson;
 import com.httplib.HttpRequest;
 import java.util.Map;
 import http.com.test2http.RequsetAPI;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -19,8 +21,8 @@ public class Test2 {
         Gson gson = new Gson();
         String jsonObject = gson.toJson(map);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject);
-        HttpRequest.request("getSQM").parameter(requestBody).from(RequsetAPI.class).build().
-        setListener(new HttpRequest.OnRequestListener<ResponseBody>() {
+        HttpRequest.request("getSQM").parameter(requestBody).from(RequsetAPI.class).create().
+        execute(new HttpRequest.CallBack<ResponseBody>() {
             @Override
             public void onSuccess(ResponseBody object) {
                 if(object != null)

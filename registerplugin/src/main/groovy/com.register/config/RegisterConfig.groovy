@@ -31,7 +31,7 @@ class RegisterConfig{
         for(RegisterInfo registerInfo: registerInfoList){
             fileName = fileName.substring(0, fileName.lastIndexOf('.class'))
             if(registerInfo.registerIntoClass.equals(fileName)) {
-                println 'xxxxxxxxxx matchRegisterFile file ' + file.absolutePath
+//                println 'xxxxxxxxxx matchRegisterFile file ' + file.absolutePath
                 registerInfo.registerIntoFile = file
                 return
             }
@@ -51,7 +51,7 @@ class RegisterConfig{
         for(String annotationName : annotationNames){
             RegisterInfo registerInfo = isMatchAnnotation(annotationName)
             if(registerInfo != null && !registerInfo.needRegisterClass.contains(fileName)) {
-                println 'xxxxxxxxx find registerInfo ' + fileName
+//                println 'xxxxxxxxx find registerInfo ' + fileName
                 fileName = fileName.substring(0, fileName.lastIndexOf('.class'))
                 registerInfo.needRegisterClass.add(fileName)
             }

@@ -12,18 +12,36 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public final class HttpRequest{
-    private OnRequestListener listener;
+    private Builder builder;
 
-    public interface OnRequestListener<T>{
+    public interface CallBack<T>{
         void onSuccess(T object);
         void onFailed(String msg);
     }
 
-    public void setListener(OnRequestListener listener){
-        this.listener = listener;
+    public HttpRequest(Builder builder){
+        this.builder = builder;
     }
 
-    private HttpRequest realRequest(Builder builder){
+    public Observable getObservable(){
+        Object object = null;
+        try {
+            final Method method = findMethod(builder.clas, builder.methodName, builder.params.getClass());
+            if (method == null)
+                throw new IllegalArgumentException("can't find method " + builder.methodName + " in class " + builder.clas.getName());
+            object = method.invoke(builder.clas, builder.params);
+            final Class returnType = method.getReturnType();
+            if(returnType.equals(io.reactivex.Observable.class))
+                return (Observable) object;
+        }catch (InvocationTargetException e){
+            e.printStackTrace();
+        }catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void execute(final CallBack callBack){
         try {
             final Method method = findMethod(builder.clas, builder.methodName, builder.params.getClass());
             if(method == null)
@@ -35,16 +53,16 @@ public final class HttpRequest{
                     @Override
                     public void onResponse(retrofit2.Call<Object> call, Response<Object> response) {
                         //数据请求成功
-                        if(listener != null){
-                            listener.onSuccess(response.body());
+                        if(callBack != null){
+                            callBack.onSuccess(response.body());
                         }
                     }
 
                     @Override
                     public void onFailure(retrofit2.Call<Object> call, Throwable t) {
                         //数据请求失败
-                        if(listener != null)
-                            listener.onFailed(t.toString());
+                        if(callBack != null)
+                            callBack.onFailed(t.toString());
                     }
                 });
             }else if(returnType.equals(io.reactivex.Observable.class)){
@@ -58,14 +76,14 @@ public final class HttpRequest{
 
                             @Override
                             public void onNext(Object object) {
-                                if(listener != null)
-                                    listener.onSuccess(object);
+                                if(callBack != null)
+                                    callBack.onSuccess(object);
                             }
 
                             @Override
                             public void onError(Throwable e) {
-                                if(listener != null)
-                                    listener.onFailed(e.toString());
+                                if(callBack != null)
+                                    callBack.onFailed(e.toString());
                             }
 
                             @Override
@@ -79,7 +97,6 @@ public final class HttpRequest{
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        return this;
     }
 
     private Method findMethod(Class clas, String methodName, Class paramClass){
@@ -124,8 +141,8 @@ public final class HttpRequest{
             return this;
         }
 
-        public HttpRequest build() {
-            return new HttpRequest().realRequest(this);
+        public HttpRequest create() {
+            return new HttpRequest(this);
         }
     }
 }

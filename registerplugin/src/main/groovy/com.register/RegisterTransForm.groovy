@@ -79,7 +79,7 @@ class RegisterTransForm extends Transform{
                 FileUtils.copyFile(src, dest)
             }
 
-            println 'xxxxxxxxx start each directory '
+//            println 'xxxxxxxxx start each directory '
             boolean leftSlash = File.separator == '/'
             //遍历文件夹
             input.directoryInputs.each {
