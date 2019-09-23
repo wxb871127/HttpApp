@@ -12,7 +12,7 @@ import retrofit2.http.Path;
 public interface RequestAPI {
 
     @GET("users/{user}/repos")
-    @Headers("baseUrl:https://api.github.com/")
+//    @Headers("baseUrl:https://api.github.com/")
     Call<List<GitHubRepo>> listRepos(@Path("user") String user);
 
     @POST

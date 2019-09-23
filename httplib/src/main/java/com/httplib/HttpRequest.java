@@ -19,6 +19,10 @@ public final class HttpRequest{
         void onFailed(String msg);
     }
 
+    public static void initUrl(String url){
+        APIManager.init(url);
+    }
+
     public HttpRequest(Builder builder){
         this.builder = builder;
     }

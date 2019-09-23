@@ -20,6 +20,10 @@ public class APIManager {
         gsonBuilder.registerTypeAdapter(type, object);
     }
 
+    public static void init(String url){
+        mUrl = url;
+    }
+
     public static <T> T getAPI(Class<T> clazz)
     {
         if (null == client)
