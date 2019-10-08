@@ -1,5 +1,7 @@
 package com.http;
 
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.Map;
 import io.reactivex.Observable;
@@ -17,5 +19,9 @@ public interface RequestAPI {
 
     @POST
     Observable<Map> getGxyFcpg(Map requestParams);
+
+    @GET("mock/286/baseurl/examinationrecord1/{examinationid}/{departmentid}")
+    @Headers("baseUrl:http://yapi.demo.qunar.com/")
+    Observable<Map> getTjjl(@Path("examinationid") String name, @Path("departmentid") String pwd);
 
 }

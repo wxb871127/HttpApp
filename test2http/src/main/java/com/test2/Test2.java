@@ -24,6 +24,11 @@ public class Test2 {
         HttpRequest.request("getSQM").parameter(requestBody).from(RequsetAPI.class).create().
         execute(new HttpRequest.CallBack<ResponseBody>() {
             @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
             public void onSuccess(ResponseBody object) {
                 if(object != null)
                     Log.e("d", object.toString());

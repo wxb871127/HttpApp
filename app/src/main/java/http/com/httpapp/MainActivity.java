@@ -13,7 +13,10 @@ import com.httplib.HttpRequest;
 import com.httplib.config.HttpConfig;
 import com.test.Test;
 import com.test2.Test2;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -35,20 +38,45 @@ public class MainActivity extends AppCompatActivity {
         appButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HttpRequest.request("listRepos").parameter("octocat").from(RequestAPI.class)
-                        .create().execute(new HttpRequest.CallBack<List<GitHubRepo>>() {
-                    @Override
-                    public void onSuccess(List<GitHubRepo> object) {
-                        for(GitHubRepo gitHubRepo : object) {
-                            Log.e("gitHubRepo", gitHubRepo.toString());
-                        }
-                    }
 
-                    @Override
-                    public void onFailed(String msg) {
-                        Log.e("d", msg);
-                    }
-                });
+//                HttpRequest.request("listRepos").parameter("octocat").from(RequestAPI.class)
+//                        .create().execute(new HttpRequest.CallBack<List<GitHubRepo>>() {
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(List<GitHubRepo> object) {
+//                        for(GitHubRepo gitHubRepo : object) {
+//                            Log.e("gitHubRepo", gitHubRepo.toString());
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailed(String msg) {
+//                        Log.e("d", msg);
+//                    }
+//                });
+
+                HttpRequest.request("getTjjl").parameter("1","2").from(RequestAPI.class).create()
+                        .execute(new HttpRequest.CallBack() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onSuccess(Object object) {
+Log.e("xxxxx", object.toString());
+                            }
+
+                            @Override
+                            public void onFailed(String msg) {
+
+                            }
+                        });
+
             }
         });
 

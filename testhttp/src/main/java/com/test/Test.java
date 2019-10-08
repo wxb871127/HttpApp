@@ -17,6 +17,11 @@ public class Test {
         HttpRequest.request("getSQM").parameter(map).from(RequsetAPI.class).create()
         .execute(new HttpRequest.CallBack<List<NonstandardBaseResult<ProjectUrlResult>>>() {
             @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
             public void onSuccess(List<NonstandardBaseResult<ProjectUrlResult>> object) {
                 Log.e("d", object.toString());
             }
