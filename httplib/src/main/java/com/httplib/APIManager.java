@@ -17,9 +17,10 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 public class APIManager {
     private static OkHttpClient client;
     private static ConcurrentHashMap<String, Object> APICache = new ConcurrentHashMap<>();
-    private static String mUrl = "http://172.18.13.233:9200/";
+    public static String mUrl = "http://172.18.13.233:9200/";
     private static Retrofit retrofit;
     private static GsonBuilder gsonBuilder = new GsonBuilder();
+    private static HttpRequest.RequestException requestException;
 
     public void registerAdapter(Type type, Object object){
         gsonBuilder.registerTypeAdapter(type, object);
@@ -36,6 +37,10 @@ public class APIManager {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void initException(HttpRequest.RequestException exception){
+        requestException = exception;
     }
 
     public static <T> T getAPI(Class<T> clazz)
@@ -74,7 +79,7 @@ public class APIManager {
                 .readTimeout(60, TimeUnit.SECONDS)
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
-               .addInterceptor(new HttpInterceptor());
+               .addInterceptor(new HttpInterceptor(requestException));
        return  builder.build();
     }
 }

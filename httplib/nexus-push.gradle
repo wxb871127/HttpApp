@@ -7,7 +7,7 @@ apply plugin: 'maven'
 //artifacts {
 //    archives sourcesJar
 //}
-def debug = false
+def debug = true
 
 //任务名
 uploadArchives {
@@ -34,7 +34,7 @@ uploadArchives {
             // library的项目名
             pom.artifactId = 'httplib'
             // library的版本号
-            pom.version = '1.0.5'
+            pom.version = '1.0.6'
 
             pom.project {
                 licenses {

@@ -8,6 +8,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.Request;
 import retrofit2.Callback;
 import retrofit2.Response;
 
@@ -22,6 +23,10 @@ public final class HttpRequest{
 
     public static void initUrl(String url){
         APIManager.init(url);
+    }
+
+    public static void initException(RequestException exception){
+        APIManager.initException(exception);
     }
 
     public HttpRequest(Builder builder){
@@ -143,6 +148,10 @@ public final class HttpRequest{
 
     public static Builder request(String methodName) {
         return new Builder(methodName);
+    }
+
+    public interface RequestException{
+        void handle(Request request, okhttp3.Response response);
     }
 
     public static final class Builder {

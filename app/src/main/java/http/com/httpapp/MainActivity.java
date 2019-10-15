@@ -1,28 +1,22 @@
 package http.com.httpapp;
 
-import android.app.ActivityManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import com.http.GitHubRepo;
+
+import com.http.NonstandParam;
 import com.http.RequestAPI;
 import com.httplib.HttpRequest;
 import com.httplib.config.HttpConfig;
 import com.test.Test;
 import com.test2.Test2;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
-import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         Button appButton = findViewById(R.id.appButton);
         Button button1 = findViewById(R.id.button1);
         Button button2 = findViewById(R.id.button2);
+        Button button3 = findViewById(R.id.button3);
 
         HttpConfig.init();
         appButton.setOnClickListener(new View.OnClickListener() {
@@ -59,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 //                    }
 //                });
 
-                HttpRequest.request("getTjjl").parameter("1","2").from(RequestAPI.class).create()
+                HttpRequest.request("getTjjl").parameter("1", "2").from(RequestAPI.class).create()
                         .execute(new HttpRequest.CallBack() {
                             @Override
                             public void onSubscribe(Disposable d) {
@@ -68,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void onSuccess(Object object) {
-Log.e("xxxxx", object.toString());
+                                Log.e("xxxxx", object.toString());
                             }
 
                             @Override
@@ -94,5 +89,60 @@ Log.e("xxxxx", object.toString());
             }
         });
 
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                querySQM();
+
+            }
+        });
+
     }
+
+    private void querySQM(){
+        Map map = NonstandParam.getQueryParams("tjzxsqm", "yhtj");
+        HttpRequest.request("getSQM").parameter(map).from(RequestAPI.class).create().execute(new HttpRequest.CallBack<Object>() {
+            @Override
+            public void onSubscribe(Disposable disposable) {
+
+            }
+
+            @Override
+            public void onSuccess(Object datas) {
+//                HttpRequest.initUrl("http://yapi.demo.qunar.com/mock/286/");
+                HttpRequest.initUrl("http://yapi.demo.qunar.com/");
+                queryYSList();
+            }
+
+            @Override
+            public void onFailed(String s) {
+                Log.e("xx", s);
+            }
+        });
+    }
+
+    private void queryYSList(){
+        Map map = NonstandParam.getQueryExaminerParams(0, 10);
+        HttpRequest.request("getUploadedExaminer").parameter(map).from(RequestAPI.class).create()
+                .execute(new HttpRequest.CallBack<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable disposable) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Object listData) {
+
+                        Log.e("xx", listData.toString());
+
+                    }
+
+                    @Override
+                    public void onFailed(String s) {
+                        Log.e("xx", s);
+                    }
+                });
+    }
+
+
 }
