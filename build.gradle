@@ -16,6 +16,13 @@ buildscript {
 allprojects {
     repositories {
         maven{ url rootProject.file("repo") }
+        maven {
+            url("http://172.18.13.233:8081/repository/maven-releases")
+            credentials {
+                username 'admin'
+                password rootProject.MAVEN_PASSWORD
+            }
+        }
         google()
         jcenter()
     }

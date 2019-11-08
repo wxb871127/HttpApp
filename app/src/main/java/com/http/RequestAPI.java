@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Streaming;
+import retrofit2.http.Url;
 
 public interface RequestAPI {
 
@@ -36,5 +39,11 @@ public interface RequestAPI {
     @Headers("baseUrl:http://172.18.13.233:9200/")
     @POST("ryxx/ryxx/_search")
     Observable<Object> getUploadedExaminer(@Body Map requestParams);
+
+
+//    @Streaming //注解这个请求将获取数据流,此后将不会这些获取的请求数据保存到内存中,将交与你操作.
+//    @GET
+//    Call<ResponseBody> download(@Url String url);
+
 
 }

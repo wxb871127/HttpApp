@@ -1,8 +1,9 @@
 package com.httplib.interceptor;
 
+import com.httplib.APIManager;
 import com.httplib.HttpRequest;
-
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -33,17 +34,38 @@ public class HttpInterceptor implements Interceptor {
             String headerValue = headerValues.get(0);
             HttpUrl newBaseUrl = HttpUrl.parse(headerValue);
             //重建新的HttpUrl，修改需要修改的url部分
-            HttpUrl newFullUrl = oldHttpUrl
-                    .newBuilder()
+
+            String uri = oldHttpUrl.scheme()+"://"+oldHttpUrl.host()+":"+oldHttpUrl.port()+"/";
+            String oldPath = APIManager.mUrl.replace(uri, "");
+            List<String> rwaPathSegments = oldHttpUrl.pathSegments();
+            List<String> pathSegments = new ArrayList<>();
+            for(String segment : rwaPathSegments)
+                pathSegments.add(segment);
+
+            if(!oldPath.isEmpty()) {
+                String[] oldpathSegments = oldPath.split("/");
+                for (int i = 0; i < oldpathSegments.length; i++) {
+                    pathSegments.remove(oldpathSegments[i]);
+                }
+            }
+
+            HttpUrl.Builder newBuilder = new HttpUrl.Builder()
                     .scheme(newBaseUrl.scheme())
                     .host(newBaseUrl.host())
-                    .port(newBaseUrl.port())
-                    .build();
+                    .port(newBaseUrl.port());
+            for(String segment : pathSegments)
+                newBuilder.addPathSegment(segment);
+
+            HttpUrl newFullUrl = newBuilder.build();
+
             response = chain.proceed(builder.url(newFullUrl).build());
+        }else {
+            response = chain.proceed(request);
         }
-        response = chain.proceed(request);
+        Response response1 = response.newBuilder().body(response.body()).build();
+        Response response2 = response.newBuilder().body(response.body()).build();
         if(exception != null)
-            exception.handle(request, response);
-        return response;
+            exception.handle(response1);
+        return response2;
     }
 }

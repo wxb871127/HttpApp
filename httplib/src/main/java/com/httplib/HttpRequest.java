@@ -1,6 +1,13 @@
 package com.httplib;
 
+import android.os.Handler;
+import android.os.Message;
 import com.httplib.config.HttpConfig;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import io.reactivex.Observable;
@@ -8,7 +15,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.Request;
+import okhttp3.ResponseBody;
 import retrofit2.Callback;
 import retrofit2.Response;
 
@@ -20,6 +27,13 @@ public final class HttpRequest{
         void onSuccess(T object);
         void onFailed(String msg);
     }
+
+    public interface CallStatus{
+        void onDownload(int progress);
+        void onSucess(String filePath);
+        void onFailed(String msg);
+    }
+
 
     public static void initUrl(String url){
         APIManager.init(url);
@@ -51,12 +65,101 @@ public final class HttpRequest{
         return null;
     }
 
+
+
+    private void downloadFile(final CallStatus callStatus, final String file){
+        try {
+            final Method method = findMethod(builder.clas, builder.methodName, builder.params);
+            if (method == null)
+                throw new IllegalArgumentException("can't find method " + builder.methodName + " in class " + builder.clas.getName());
+            Object object = method.invoke(builder.clas, builder.params);
+            ((Observable)object).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<ResponseBody>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(final ResponseBody response) {
+                           final Handler handler = new Handler(){
+                                @Override
+                                public void handleMessage(Message msg) {
+                                    super.handleMessage(msg);
+                                    switch (msg.what){
+                                        case 1:
+                                            if(callStatus != null)
+                                                callStatus.onDownload(msg.arg1);
+                                            break;
+                                        case 2:
+                                            if(callStatus != null)
+                                                callStatus.onSucess(file);
+                                            break;
+                                    }
+                                }
+                            };
+
+                            new Thread(){
+                                @Override
+                                public void run() {
+                                    try {
+                                        long total = response.contentLength();//需要下载的总大小
+                                        long current = 0;
+                                        InputStream inputStream = response.byteStream();
+                                        FileOutputStream fileOutputStream = new FileOutputStream(file);
+                                        byte[] bytes = new byte[1024];
+                                        int len = 0;
+                                        while ((len = inputStream.read(bytes)) > 0) {
+                                            fileOutputStream.write(bytes, 0, len);
+                                            fileOutputStream.flush();
+                                            current = current + len;
+                                            Message message = Message.obtain();
+                                            message.what = 1;
+                                            message.arg1 = (int) (current*100/total);
+                                            handler.sendMessage(message);
+                                        }
+                                        fileOutputStream.flush();
+                                        fileOutputStream.close();
+                                        inputStream.close();
+                                    } catch (FileNotFoundException e) {
+                                        e.printStackTrace();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    Message message = Message.obtain();
+                                    message.what = 2;
+                                    message.obj = file;
+                                    handler.sendMessage(message);
+                                }
+                            }.start();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            if(callStatus != null)
+                                callStatus.onFailed(e.toString());
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+        }catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void execute(final CallBack callBack){
         try {
             final Method method = findMethod(builder.clas, builder.methodName, builder.params);
             if(method == null)
                 throw new IllegalArgumentException("can't find method " + builder.methodName + " in class " + builder.clas.getName());
             Object object = method.invoke(builder.clas, builder.params);
+
             final Class returnType = method.getReturnType();
             if(returnType.equals(retrofit2.Call.class)){
                 ((retrofit2.Call)object).enqueue(new Callback<Object>() {
@@ -110,6 +213,34 @@ public final class HttpRequest{
         }
     }
 
+    public static void downloadFile(String urlPath, String filePath, final CallStatus callBack){
+        final File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+        }
+        request("download").parameter(urlPath).from(RequestAPI.class)
+                .create().downloadFile(new CallStatus() {
+
+            @Override
+            public void onDownload(int progress) {
+                if(callBack != null)
+                    callBack.onDownload(progress);
+            }
+
+            @Override
+            public void onSucess(String filePath) {
+                if(callBack != null)
+                    callBack.onSucess(filePath);
+            }
+
+            @Override
+            public void onFailed(String msg) {
+                if(callBack != null)
+                    callBack.onFailed(msg);
+            }
+        }, filePath);
+    }
+
     private Method findMethod(Class clas, String methodName, Object... params){
         Method method = null;
         if(params == null || params.length == 0){
@@ -151,7 +282,7 @@ public final class HttpRequest{
     }
 
     public interface RequestException{
-        void handle(Request request, okhttp3.Response response);
+        void handle(okhttp3.Response response);
     }
 
     public static final class Builder {
