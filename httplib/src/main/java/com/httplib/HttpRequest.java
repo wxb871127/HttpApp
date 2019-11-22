@@ -3,6 +3,9 @@ package com.httplib;
 import android.os.Handler;
 import android.os.Message;
 import com.httplib.config.HttpConfig;
+
+import org.apache.http.params.HttpParams;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,6 +21,7 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.adapter.rxjava2.HttpException;
 
 public final class HttpRequest{
     private Builder builder;
@@ -197,7 +201,7 @@ public final class HttpRequest{
                             @Override
                             public void onError(Throwable e) {
                                 if(callBack != null)
-                                    callBack.onFailed(e.toString());
+                                    callBack.onFailed("网络异常:"+((HttpException)e).code());
                             }
 
                             @Override
